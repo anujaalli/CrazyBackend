@@ -5,8 +5,22 @@ const app = express()
 var MongoClient = require('mongodb').MongoClient
   , assert = require('assert');
 
+  var db;
+
+// Initialize connection once
+MongoClient.connect("mongodb://localhost:27017/myproject", function(err, database) {
+  if(err) throw err;
+
+  db = database;
+
+  // Start the application after the database connection is ready
+  app.listen(3000);
+  console.log("Listening on port 3000");
+});
+  
+  
 // Connection URL
-var url = 'mongodb://localhost:27017/myproject';
+//var url = 'mongodb://localhost:27017/myproject';
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}) );
 
@@ -19,9 +33,6 @@ app.all("/*", function(req, res, next){
 
 app.post('/ping', function (req, res) {
   res.send(req.body)
-  console.log(req.body);
-  var insertDocuments = function(db) {
-  // Get the documents collection
   var collection = db.collection('loginDetails');
   // Insert some documents
   collection.insertMany([
@@ -33,33 +44,23 @@ app.post('/ping', function (req, res) {
     console.log("Inserted 3 documents into the collection");
     
   });
-}
-
-// Use connect method to connect to the server
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected successfully to server");
-  insertDocuments(db);
- // findDocuments(db);
-  db.close();
-});
-  
- 
-
 })
-app.get('/ping',function (req, res) {
-// Use connect method to connect to the server
-
-//console.log(req.query.username);
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected successfully to server");
-  findDocuments(db);
-  db.close();
+app.get('/women',function (req, res) {
+	
+    var collection = db.collection('womenTable');
+  collection.find().toArray(function(err, docs) {
+    assert.equal(err, null);
+    console.log("Found the following records");
+    console.log(docs)
+    if(docs.length>0){
+	res.send(docs);
+	}
+	else{
+	res.send("not found");
+	}
+  });
 });
-var findDocuments = function(db) {
-  // Get the documents collection
-
+app.get('/ping',function (req, res) {
     var collection = db.collection('loginDetails');
   // Find some documents
   console.log(req.query.username);
@@ -78,31 +79,6 @@ var findDocuments = function(db) {
 	res.send({"found":"false"});
 	}
   });
-
-  
-  
-  /*var collection = db.collection('loginDetails');
-  // Find some documents
-  console.log(collection.findOne({
-  $and: [{"username": req.query.username},
-  {"password":req.query.password}]}));
-  
-  
-	if (collection.findOne({
-  $and: [{"username": req.query.username},
-  {"password":req.query.password}]})){
-  console.log("sending...");
-res.send({"anuja2":"jkasdfnh"});
-    
-}
-else{
-console.log("Not found");
-res.send({"anuja3":"jkasdfnh"});
-}*/
-}
-
 });
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
-})
+
