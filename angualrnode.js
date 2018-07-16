@@ -68,15 +68,12 @@ app.get('/ping',function (req, res) {
   $and: [{"username": req.query.username},
   {"password":req.query.password}]}).toArray(function(err, docs) {
     assert.equal(err, null);
-    console.log("Found the following records");
-    console.log(docs.length)
-    if(docs.length>0){
+    if(docs.length==1){
 	console.log("inside");
-	res.send({"found":"true"});
+	res.send(docs[0]);
 	}
 	else{
-	console.log("outside");
-	res.send({"found":"false"});
+	res.send(null);
 	}
   });
 });
