@@ -46,9 +46,9 @@ app.post('/ping', function (req, res) {
   });
 })
 app.get('/women',function (req, res) {
-	
+	  console.log(req.query.size);
     var collection = db.collection('womenTable');
-  collection.find().toArray(function(err, docs) {
+  collection.find({"size": req.query.size}).toArray(function(err, docs) {
     assert.equal(err, null);
     console.log("Found the following records");
     console.log(docs)
